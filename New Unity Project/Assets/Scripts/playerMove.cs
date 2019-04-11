@@ -9,11 +9,18 @@ public class playerMove : MonoBehaviour
     public float rotSpeed = 5f;
     private Rigidbody rb;
     public Transform ypivot;
+    public float jumpExe = 10f;
+    private bool canJump = true;
+    public float groundDist;
+    public float extraGrdDist = .5f;
+    public float fallMult = 1.5f;
+    public float lowMult = 1.8f;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
+        groundDist = GetComponentInChildren<CapsuleCollider>().bounds.extents.y;
     }
 
     // Update is called once per frame
@@ -25,7 +32,23 @@ public class playerMove : MonoBehaviour
 
     private void JumpPlayer()
     {
-
+        if (rb.velocity.y < 0)
+        {
+            rb.velocity += Vector3.up * Physics.gravity.y * fallMult * Time.deltaTime;
+        }
+        else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
+        {
+            rb.velocity += Vector3.up * Physics.gravity.y * lowMult * Time.deltaTime;
+        }
+        if (!canJump)
+        {
+            canJump = Physics.Raycast(transform.position, Vector3.down, groundDist + extraGrdDist);
+        }
+        if (Input.GetButtonDown("Jump") && canJump)
+        {
+            rb.AddForce(Vector3.up * jumpExe, ForceMode.VelocityChange);
+            canJump = false;
+        }
     }
 
     private void MovePlayer()
