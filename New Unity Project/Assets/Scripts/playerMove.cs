@@ -12,7 +12,7 @@ public class playerMove : MonoBehaviour
     public float jumpExe = 10f;
     private bool canJump = true;
     public float groundDist;
-    public float extraGrdDist = .5f;
+    public float extraGrdDist = .3f;
     public float fallMult = 1.5f;
     public float lowMult = 1.8f;
 
@@ -32,6 +32,7 @@ public class playerMove : MonoBehaviour
 
     private void JumpPlayer()
     {
+        bool grdDist = Physics.Raycast(transform.position, Vector3.down, groundDist + extraGrdDist);
         if (rb.velocity.y < 0)
         {
             rb.velocity += Vector3.up * Physics.gravity.y * fallMult * Time.deltaTime;
@@ -40,9 +41,9 @@ public class playerMove : MonoBehaviour
         {
             rb.velocity += Vector3.up * Physics.gravity.y * lowMult * Time.deltaTime;
         }
-        if (!canJump)
+        if (!canJump && rb.velocity.y <= 0)
         {
-            canJump = Physics.Raycast(transform.position, Vector3.down, groundDist + extraGrdDist);
+            canJump = grdDist;
         }
         if (Input.GetButtonDown("Jump") && canJump)
         {
