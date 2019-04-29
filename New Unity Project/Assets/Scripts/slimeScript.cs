@@ -7,6 +7,7 @@ public class slimeScript : MonoBehaviour
 
     private Animator anim;
     public Transform player;
+    public float aggro = 7f;
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -16,7 +17,7 @@ public class slimeScript : MonoBehaviour
     void Update()
     {
         
-        if (Vector3.Distance(transform.position, player.position) < 2f)
+        if (Vector3.Distance(transform.position, player.position) < aggro)
         {
             anim.SetBool("jumping", true);
         }

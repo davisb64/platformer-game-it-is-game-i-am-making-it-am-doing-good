@@ -9,7 +9,7 @@ public class slimeParentScript : MonoBehaviour
     public float slimeSpeed = 1f;
     private bool follow = false;
     private bool idle = true;
-    public float aggro = 2f;
+    public float aggro = 15f;
     private int wpHead = 0;
     private Transform headTo;
     private float wayProx = .2f;
@@ -17,7 +17,7 @@ public class slimeParentScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        wayList = transform.GetComponentInChildren<waypointSetup>().points;
+        wayList = transform.parent.GetComponentInChildren<waypointSetup>().points;
         headTo = wayList[wpHead];
     }
 
@@ -30,7 +30,16 @@ public class slimeParentScript : MonoBehaviour
 
     private void checkAggro()
     {
-        throw new NotImplementedException();
+        if(Vector3.Distance(transform.position, player.position) <= aggro)
+        {
+            follow = true;
+            idle = false;
+        }
+        else
+        {
+            follow = false;
+            idle = true;
+        }
     }
 
     private void moveSlime()
@@ -42,11 +51,11 @@ public class slimeParentScript : MonoBehaviour
         }
         else if (idle)
         {
-            Vector3 direction = headTo.position - transform.position;
             if (Vector3.Distance(transform.position, headTo.position) < wayProx)
             {
                 GetNextWaypoint();
             }
+            transform.position = Vector3.MoveTowards(transform.position, headTo.position, slimeSpeed * Time.deltaTime);
         }
     }
 
