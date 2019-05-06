@@ -9,11 +9,11 @@ public class playerMove : MonoBehaviour
     public float rotSpeed = 5f;
     private Rigidbody rb;
     public Transform ypivot;
-    public float jumpExe = 10f;
+    public float jumpExe = 3f;
     private bool canJump = true;
     public float groundDist;
-    public float extraGrdDist = .3f;
-    public float fallMult = 1.5f;
+    public float extraGrdDist = 10.5f;
+    public float fallMult = 1.8f;
     public float lowMult = 1.8f;
     private Animator anim;
     public float dead = .1f;
@@ -23,7 +23,7 @@ public class playerMove : MonoBehaviour
     {
         rb = this.GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
-        groundDist = GetComponentInChildren<CapsuleCollider>().bounds.extents.y;
+        groundDist = GetComponentInChildren<BoxCollider>().bounds.extents.y;
     }
 
     // Update is called once per frame
@@ -46,13 +46,30 @@ public class playerMove : MonoBehaviour
         }
         if (!canJump && rb.velocity.y <= 0)
         {
+            anim.SetBool("jump", false);
             canJump = grdDist;
+            Debug.Log(canJump.ToString());
         }
         if (Input.GetButtonDown("Jump") && canJump)
         {
-            rb.AddForce(Vector3.up * jumpExe, ForceMode.VelocityChange);
+            anim.SetBool("jump", true);
             canJump = false;
         }
+    }
+
+    private void AddJump()
+    {
+            rb.AddForce(Vector3.up * jumpExe, ForceMode.VelocityChange);
+    }
+
+    private void FastAnim()
+    {
+        anim.speed = 1.5f;
+    }
+
+    private void NormalAnim()
+    {
+        anim.speed = 1f;
     }
 
     private void MovePlayer()
@@ -62,12 +79,10 @@ public class playerMove : MonoBehaviour
         if(Mathf.Abs(hMov) > dead || Mathf.Abs(vMov) > dead)
         {
             anim.SetBool("walk", true);
-            anim.SetBool("jump", false);
         }
         else
         {
             anim.SetBool("walk", false);
-            anim.SetBool("jump", false);
         }
 
         Vector3 moveDirection = new Vector3(hMov * moveSpeed, 0f, vMov * moveSpeed);
