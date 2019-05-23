@@ -17,6 +17,12 @@ public class playerMove : MonoBehaviour
     public float lowMult = 1.8f;
     private Animator anim;
     public float dead = .1f;
+    private Rigidbody kickedRB;
+    public Animation playerAnimation;
+    public bool kick = false;
+    float kickForce = 10f;
+    private GameObject touched;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +30,7 @@ public class playerMove : MonoBehaviour
         rb = this.GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         groundDist = GetComponentInChildren<BoxCollider>().bounds.extents.y;
+        playerAnimation = GetComponent<Animation>();
     }
 
     // Update is called once per frame
@@ -31,6 +38,7 @@ public class playerMove : MonoBehaviour
     {
         MovePlayer();
         JumpPlayer();
+        KickObject();
     }
 
     private void JumpPlayer()
@@ -48,7 +56,6 @@ public class playerMove : MonoBehaviour
         {
             anim.SetBool("jump", false);
             canJump = grdDist;
-            Debug.Log(canJump.ToString());
         }
         if (Input.GetButtonDown("Jump") && canJump)
         {
@@ -94,6 +101,46 @@ public class playerMove : MonoBehaviour
         rb.MoveRotation(Quaternion.LookRotation(lookRot));
 
         rb.MovePosition(transform.position + facing * Time.deltaTime);
+    }
+
+    private void KickObject()
+    {
+        if (Input.GetButtonDown("Kick"))
+        {
+            anim.SetBool("kicking", true);
+        }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        touched = other.gameObject;
+        Debug.Log("Touched " + touched);
+        //KickActual(other);
+    }
+
+    private void KickActual()
+    {
+        GameObject other;
+        other = touched;
+        Debug.Log("Ran KickActual");
+        if (other.tag == "kickable" && other != null)
+        {
+            Vector3 facing = transform.forward;
+            kickedRB = other.gameObject.GetComponent<Rigidbody>();
+            Debug.Log("Kicked " + kickedRB);
+            kickedRB.AddForce(facing * kickForce, ForceMode.Impulse);
+        }
+    }
+
+    private void KickStart()
+    {
+        kick = true;
+    }
+
+    private void KickDone()
+    {
+        anim.SetBool("kicking", false);
+        kick = false;
     }
 }
     
