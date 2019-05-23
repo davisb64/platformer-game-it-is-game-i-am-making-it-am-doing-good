@@ -20,8 +20,9 @@ public class playerMove : MonoBehaviour
     private Rigidbody kickedRB;
     public Animation playerAnimation;
     public bool kick = false;
-    float kickForce = 10f;
+    float kickForce = 5f;
     private GameObject touched;
+    public static bool die = false;
     
 
     // Start is called before the first frame update
@@ -112,23 +113,26 @@ public class playerMove : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision other)
-    {
-        touched = other.gameObject;
-        Debug.Log("Touched " + touched);
+    {   
+        if (other.gameObject.tag == "kickable")
+        {
+            touched = other.gameObject;
+        }
         //KickActual(other);
     }
 
     private void KickActual()
     {
-        GameObject other;
-        other = touched;
-        Debug.Log("Ran KickActual");
-        if (other.tag == "kickable" && other != null)
+        GameObject linked;
+        if (touched.tag == "kickable")
         {
-            Vector3 facing = transform.forward;
-            kickedRB = other.gameObject.GetComponent<Rigidbody>();
-            Debug.Log("Kicked " + kickedRB);
-            kickedRB.AddForce(facing * kickForce, ForceMode.Impulse);
+            linked = touched;
+            if (linked != null)
+            {
+                Vector3 facing = transform.forward;
+                kickedRB = linked.gameObject.GetComponent<Rigidbody>();
+                kickedRB.AddForce(facing * kickForce, ForceMode.Impulse);
+            }
         }
     }
 
@@ -141,6 +145,14 @@ public class playerMove : MonoBehaviour
     {
         anim.SetBool("kicking", false);
         kick = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("deathplane")){
+            die = true;
+            Destroy(this.gameObject);
+        }
     }
 }
     
